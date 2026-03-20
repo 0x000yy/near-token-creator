@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEAR Token Creator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+:root{--g:#00EC97;--g2:#00C97E;--dark:#070F1C;--card:#0C1B30;--card2:#0F2038;--border:#1A3050;--text:#C8DFF0;--muted:#4A6A85;--red:#FF4D6D}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.orb1{width:500px;height:500px;background:rgba(0,236,151,.06);top:-120px;right:-100px}
+.orb2{width:400px;height:400px;background:rgba(59,130,246,.05);bottom:-60px;left:-80px}
+
+/* HEADER */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:15px 24px;border-bottom:1px solid var(--border);background:rgba(7,15,28,.96);backdrop-filter:blur(16px);position:sticky;top:0;z-index:300}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer}
+.logo-box{width:34px;height:34px;background:var(--g);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:.9rem;box-shadow:0 0 16px rgba(0,236,151,.3)}
+.logo-txt{font-size:1.1rem;font-weight:900;color:#fff}.logo-txt em{color:var(--g);font-style:normal}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.btn-dash{display:flex;align-items:center;gap:5px;padding:8px 13px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s}
+.btn-dash:hover{background:rgba(255,255,255,.09)}
+#wBtn{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.87rem;font-weight:700;cursor:pointer;transition:.2s;border:1.5px solid var(--g);background:transparent;color:var(--g)}
+#wBtn:hover,#wBtn.on{background:var(--g);color:#000}
+#wBtn.on{font-size:.74rem;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;backdrop-filter:blur(5px)}
+.modal-bg.show{display:flex}
+.modal{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:22px 22px 0 0;padding:24px 20px 40px;width:100%;max-width:460px;animation:up .3s cubic-bezier(.16,1,.3,1);position:relative}
+@keyframes up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.mbar{width:38px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 18px}
+.mx{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:.2s}
+.mx:hover{color:#fff}
+.modal h3{font-size:1.05rem;color:#fff;font-weight:800;text-align:center;margin-bottom:3px}
+.msub{font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:16px}
+.net-row{display:flex;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:11px;padding:3px;gap:3px;margin-bottom:14px}
+.nb{flex:1;padding:8px;background:transparent;border:none;border-radius:9px;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s}
+.nb.act{background:var(--g);color:#000}
+.wl{display:flex;flex-direction:column;gap:8px}
+.wi{display:flex;align-items:center;gap:11px;padding:13px 14px;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:13px;cursor:pointer;transition:.25s}
+.wi:hover{border-color:var(--g);background:rgba(0,236,151,.04);transform:translateX(-2px)}
+.wico{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(255,255,255,.05)}
+.wn{font-weight:700;color:#fff;font-size:.9rem}.wd{font-size:.71rem;color:var(--muted);margin-top:1px}
+.wtag{margin-right:auto;background:rgba(0,236,151,.12);color:var(--g);font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:20px;border:1px solid rgba(0,236,151,.25)}
+
+/* WRAP */
+.wrap{max-width:640px;margin:0 auto;padding:40px 15px 80px;position:relative;z-index:1}
+.hero{text-align:center;margin-bottom:36px}
+.hbadge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,236,151,.07);border:1px solid rgba(0,236,151,.18);color:var(--g);font-size:.76rem;font-weight:700;padding:5px 13px;border-radius:20px;margin-bottom:14px}
+.hero h1{font-size:2.3rem;font-weight:900;color:#fff;line-height:1.25;margin-bottom:12px}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--g),#00BFFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:.92rem;line-height:1.85;max-width:460px;margin:0 auto}
+
+/* PROGRESS */
+.prog{display:flex;background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:28px}
+.ps{flex:1;padding:12px 5px;text-align:center;border-left:1px solid var(--border);color:var(--muted);font-size:.76rem;transition:.3s;opacity:.5}
+.ps:last-child{border-left:none}
+.ps.act{opacity:1;color:var(--g);background:rgba(0,236,151,.05)}
+.ps.done{opacity:.9;color:var(--text)}
+.ps b{display:block;width:21px;height:21px;border-radius:50%;margin:0 auto 4px;line-height:21px;font-size:.71rem;background:var(--border)}
+.ps.act b{background:var(--g);color:#000;box-shadow:0 0 10px rgba(0,236,151,.35)}
+.ps.done b{background:rgba(0,236,151,.18);color:var(--g)}
+
+/* CARD */
+.card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:18px;padding:26px;margin-bottom:14px;box-shadow:0 4px 30px rgba(0,0,0,.25)}
+.cardh{font-size:1rem;font-weight:800;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.chico{width:30px;height:30px;background:rgba(0,236,151,.09);border:1px solid rgba(0,236,151,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+
+/* FORM */
+.field{margin-bottom:17px}
+label{display:block;font-size:.84rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.hint{font-weight:400;color:var(--muted);font-size:.74rem;margin-right:5px}
+input,select{width:100%;background:rgba(0,0,0,.3);border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;color:#fff;font-family:'Cairo',sans-serif;font-size:.9rem;outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(0,236,151,.05)}
+input::placeholder{color:var(--muted);font-size:.83rem}
+select option{background:#0A1628}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fn{font-size:.71rem;color:var(--muted);margin-top:4px}
+
+/* ALERTS */
+.al{border-radius:10px;padding:11px 13px;font-size:.81rem;margin-bottom:13px;display:flex;align-items:flex-start;gap:7px;line-height:1.7}
+.al-info{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);color:#93C5FD}
+.al-warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);color:#FCD34D}
+.al-ok{background:rgba(0,236,151,.07);border:1px solid rgba(0,236,151,.18);color:var(--g)}
+.al-err{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.18);color:var(--red)}
+
+/* PREVIEW */
+.prev{background:rgba(0,236,151,.03);border:1px dashed rgba(0,236,151,.22);border-radius:13px;padding:15px;margin-top:18px;display:flex;align-items:center;gap:13px}
+.pico{width:50px;height:50px;border-radius:50%;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,var(--g),#00BFFF);display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:900;color:#000}
+.pico img{width:100%;height:100%;object-fit:cover}
+
+/* COST */
+.cr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.81rem}
+.cr:last-child{border-bottom:none}
+.cl{color:var(--muted)}.cv{color:#fff;font-weight:600}.cvg{color:var(--g);font-weight:600}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;border:none}
+.btnp{background:linear-gradient(135deg,var(--g),var(--g2));color:#000;margin-top:16px;box-shadow:0 4px 18px rgba(0,236,151,.18)}
+.btnp:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,236,151,.28)}
+.btnp:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btns{background:transparent;color:var(--text);border:1.5px solid var(--border)!important;margin-top:8px}
+.btns:hover{background:rgba(255,255,255,.04)}
+.btnb{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;margin-top:8px;box-shadow:0 4px 18px rgba(59,130,246,.18)}
+.btnb:hover{transform:translateY(-2px)}
+.sp{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SCREENS */
+.scr{display:none}.scr.show{display:block}
+
+/* SUCCESS / TOKEN PAGE */
+.tkhero{background:linear-gradient(135deg,rgba(0,236,151,.07),rgba(0,120,255,.05));border:1px solid rgba(0,236,151,.13);border-radius:18px;padding:24px;margin-bottom:14px;text-align:center}
+.tkhico{width:76px;height:76px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--g),#00BFFF);display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:900;color:#000;margin:0 auto 12px;box-shadow:0 0 28px rgba(0,236,151,.22)}
+.tkhico img{width:100%;height:100%;object-fit:cover}
+.tkhero h2{font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:3px}
+.tkhsym{font-size:.95rem;color:var(--g);font-weight:700;margin-bottom:10px}
+.tkstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:14px}
+.tks{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:11px;padding:11px 7px;text-align:center}
+.tksv{font-size:.93rem;font-weight:800;color:#fff;margin-bottom:2px}
+.tksl{font-size:.68rem;color:var(--muted)}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:rgba(0,0,0,.14);border:1px solid var(--border);border-radius:10px;font-size:.81rem;margin-bottom:8px}
+.ik{color:var(--muted)}.iv{color:#fff;font-weight:600;direction:ltr;font-family:monospace;font-size:.73rem}.ivg{color:var(--g);font-weight:600;font-family:monospace;font-size:.73rem}
+.cbox{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-family:monospace;font-size:.77rem;color:var(--g);word-break:break-all;direction:ltr;text-align:left;cursor:pointer;transition:.2s;margin-bottom:5px}
+.cbox:hover{background:rgba(0,236,151,.04)}
+.chint{font-size:.71rem;color:var(--muted);margin-bottom:14px}
+
+/* LIQ */
+.lqs{display:flex;align-items:flex-start;gap:11px;padding:13px;background:rgba(0,0,0,.13);border:1px solid var(--border);border-radius:11px;margin-bottom:9px}
+.lqn{width:24px;height:24px;border-radius:50%;background:var(--g);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.76rem;flex-shrink:0;margin-top:1px}
+.lqt{font-weight:700;color:#fff;font-size:.86rem;margin-bottom:2px}
+.lqb{font-size:.76rem;color:var(--muted);line-height:1.6}
+.lqb a{color:var(--g);text-decoration:none}
+.lqb code{background:rgba(0,236,151,.09);color:var(--g);padding:1px 5px;border-radius:4px;font-size:.73rem}
+
+/* DASHBOARD */
+.dempty{text-align:center;padding:46px 20px;border:1px dashed var(--border);border-radius:18px}
+.dempty p{color:var(--muted);font-size:.88rem;margin-top:9px}
+.tkcard{display:flex;align-items:center;gap:12px;padding:14px;background:rgba(0,0,0,.13);border:1.5px solid var(--border);border-radius:13px;margin-bottom:9px;cursor:pointer;transition:.2s}
+.tkcard:hover{border-color:var(--g);background:rgba(0,236,151,.03)}
+.tkcico{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,var(--g),#00BFFF);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:.86rem}
+.tkcico img{width:100%;height:100%;object-fit:cover}
+.tkcn{font-weight:700;color:#fff;font-size:.9rem}
+.tkca{font-size:.68rem;color:var(--muted);direction:ltr;margin-top:2px;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.tknet{margin-right:auto;font-size:.66rem;padding:3px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+.nm{background:rgba(0,236,151,.1);color:var(--g);border:1px solid rgba(0,236,151,.18)}
+.nt{background:rgba(59,130,246,.1);color:#93C5FD;border:1px solid rgba(59,130,246,.18)}
+
+/* DISCONNECT */
+.disc{display:none;font-size:.72rem;color:var(--red);cursor:pointer;text-decoration:underline;margin-top:8px;text-align:center}
+
+@media(max-width:500px){
+  .hdr{padding:12px 13px}
+  .btn-dash span{display:none}
+  .wrap{padding:22px 11px 60px}
+  .hero h1{font-size:1.8rem}
+  .card{padding:18px 15px}
+  .row2{grid-template-columns:1fr}
+  .tkstats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo" onclick="goPage('create')">
+    <div class="logo-box">N</div>
+    <span class="logo-txt">NEAR <em>Token</em></span>
+  </div>
+  <div class="hdr-r">
+    <button class="btn-dash" onclick="goPage('dashboard')">📋 <span>توكناتي</span></button>
+    <button id="wBtn" onclick="openWModal()">💳 <span id="wTxt">ربط المحفظة</span></button>
+  </div>
+</header>
+
+<!-- WALLET MODAL -->
+<div class="modal-bg" id="wModal" onclick="if(event.target===this)closeWModal()">
+  <div class="modal">
+    <div class="mbar"></div>
+    <button class="mx" onclick="closeWModal()">✕</button>
+    <h3>🔗 اختر محفظتك</h3>
+    <p class="msub">تدعم الموبايل والمتصفح</p>
+    <div class="net-row">
+      <button class="nb" id="mnbT" onclick="setNet('testnet')">🧪 Testnet</button>
+      <button class="nb act" id="mnbM" onclick="setNet('mainnet')">🌐 Mainnet</button>
+    </div>
+    <div class="wl">
+      <div class="wi" onclick="doConnect('here')">
+        <div class="wico">🟡</div>
+        <div><div class="wn">HERE Wallet</div><div class="wd">موبايل — Android &amp; iOS</div></div>
+        <span class="wtag">📱 موبايل</span>
+      </div>
+      <div class="wi" onclick="doConnect('near-mobile')">
+        <div class="wico">🔵</div>
+        <div><div class="wn">NEAR Mobile</div><div class="wd">التطبيق الرسمي — Android &amp; iOS</div></div>
+        <span class="wtag">📱 موبايل</span>
+      </div>
+      <div class="wi" onclick="doConnect('mynearwallet')">
+        <div class="wico">🟢</div>
+        <div><div class="wn">MyNearWallet</div><div class="wd">محفظة ويب من المتصفح</div></div>
+        <span class="wtag">🌐 ويب</span>
+      </div>
+      <div class="wi" onclick="doConnect('meteor')">
+        <div class="wico">☄️</div>
+        <div><div class="wn">Meteor Wallet</div><div class="wd">إضافة المتصفح أو ويب</div></div>
+        <span class="wtag">🌐 ويب</span>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:12px;font-size:.71rem;color:var(--muted)">🔒 مفاتيحك الخاصة لا تُشارك أبداً</p>
+  </div>
+</div>
+
+<!-- ══ PAGE: CREATE ══ -->
+<div id="page-create" class="wrap">
+  <div class="hero">
+    <div class="hbadge">⚡ NEP-141 Token Creator</div>
+    <h1>أنشئ <em>توكنك</em><br>على NEAR</h1>
+    <p>إنشاء توكن حقيقي على البلوكشين في دقائق — يدعم جميع محافظ الموبايل</p>
+  </div>
+  <div class="prog">
+    <div class="ps act" id="ps1"><b>1</b>المحفظة</div>
+    <div class="ps" id="ps2"><b>2</b>التفاصيل</div>
+    <div class="ps" id="ps3"><b>3</b>المراجعة</div>
+    <div class="ps" id="ps4"><b>4</b>✓ تم</div>
+  </div>
+
+  <!-- S1: CONNECT -->
+  <div class="scr show" id="s1">
+    <div class="card">
+      <div class="cardh"><div class="chico">🔌</div>ربط المحفظة</div>
+      <div id="s1msg"></div>
+      <div class="al al-info">ℹ️ اضغط الزر واختر محفظتك — سيتم توجيهك لمحفظتك للموافقة ثم العودة تلقائياً</div>
+      <div class="al al-warn">⚠️ الشبكة: <strong id="s1Net">Mainnet</strong> — غيّرها من نافذة الاختيار</div>
+      <button class="btn btnp" onclick="openWModal()">💳 اختيار المحفظة والربط</button>
+      <p style="text-align:center;margin-top:11px;font-size:.72rem;color:var(--muted)">🔒 آمن تماماً — التوقيع يتم عبر محفظتك</p>
+    </div>
+  </div>
+
+  <!-- S2: DETAILS -->
+  <div class="scr" id="s2">
+    <div class="card">
+      <div class="cardh"><div class="chico">🪙</div>تفاصيل التوكن</div>
+      <div class="row2">
+        <div class="field">
+          <label>اسم التوكن <span class="hint">مثال: My Token</span></label>
+          <input id="tName" placeholder="My Token" oninput="updPrev()">
+        </div>
+        <div class="field">
+          <label>الرمز <span class="hint">مثال: MTK</span></label>
+          <input id="tSym" placeholder="MTK" maxlength="10" oninput="this.value=this.value.toUpperCase();updPrev()">
+          <div class="fn">أحرف إنجليزية وأرقام فقط</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>إجمالي العرض</label>
+          <input id="tSup" type="number" value="1000000" min="1" oninput="updPrev()">
+        </div>
+        <div class="field">
+          <label>الخانات العشرية</label>
+          <select id="tDec" onchange="updPrev()">
+            <option value="0">0</option><option value="6">6</option>
+            <option value="8">8</option><option value="18">18</option>
+            <option value="24" selected>24 (افتراضي NEAR)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>وصف <span class="hint">اختياري</span></label>
+        <input id="tDesc" placeholder="وصف مختصر لتوكنك">
+      </div>
+      <div class="field">
+        <label>رابط الشعار <span class="hint">PNG أو SVG — اختياري</span></label>
+        <input id="tIcon" type="url" placeholder="https://example.com/logo.png" oninput="updIcon()">
+        <div class="fn">128×128 على الأقل</div>
+      </div>
+      <div class="prev">
+        <div class="pico" id="pIco">TK</div>
+        <div>
+          <div style="font-size:.95rem;font-weight:800;color:#fff" id="pName">اسم التوكن</div>
+          <div style="font-size:.78rem;color:var(--g);margin-top:2px;font-weight:700" id="pSym">$SYMBOL</div>
+          <div style="font-size:.71rem;color:var(--muted);margin-top:2px" id="pSup">العرض: 1,000,000</div>
+        </div>
+      </div>
+      <button class="btn btnp" onclick="goDeploy()">المتابعة للمراجعة ←</button>
+      <div class="disc" id="discBtn" onclick="disconnect()">قطع الاتصال بالمحفظة</div>
+    </div>
+  </div>
+
+  <!-- S3: REVIEW -->
+  <div class="scr" id="s3">
+    <div class="card">
+      <div class="cardh"><div class="chico">✅</div>مراجعة ونشر التوكن</div>
+      <div style="background:rgba(0,0,0,.18);border-radius:11px;padding:13px;margin-bottom:13px" id="reviewBox"></div>
+      <div class="cr"><span class="cl">رسوم النشر</span><span class="cv">~3 NEAR</span></div>
+      <div class="cr"><span class="cl">رسوم الغاز</span><span class="cv">300 TGas</span></div>
+      <div class="cr"><span class="cl">الشبكة</span><span class="cvg" id="rNet">-</span></div>
+      <div class="cr"><span class="cl">عنوان العقد</span><span class="cvg" id="rCon" style="font-size:.69rem;direction:ltr;font-family:monospace">-</span></div>
+      <div class="al al-warn" style="margin-top:13px">⚠️ لا يمكن تعديل الاسم أو الرمز بعد النشر</div>
+      <button class="btn btnp" id="depBtn" onclick="deployToken()">🚀 نشر التوكن الآن</button>
+      <button class="btn btns" onclick="goStep(2)">← العودة للتعديل</button>
+    </div>
+  </div>
+
+  <!-- S4: SUCCESS -->
+  <div class="scr" id="s4">
+    <div class="tkhero">
+      <div class="tkhico" id="thIco">TK</div>
+      <h2 id="thName">-</h2>
+      <div class="tkhsym" id="thSym">$-</div>
+      <div class="tkstats">
+        <div class="tks"><div class="tksv" id="thSup">-</div><div class="tksl">إجمالي العرض</div></div>
+        <div class="tks"><div class="tksv" id="thDec">-</div><div class="tksl">الخانات العشرية</div></div>
+        <div class="tks"><div class="tksv" id="thNet">-</div><div class="tksl">الشبكة</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cardh"><div class="chico">📄</div>معلومات العقد</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">عنوان العقد (انقر للنسخ):</div>
+      <div class="cbox" id="sucAddr" onclick="copyAddr()">-</div>
+      <div class="chint" id="copyHint">📋 انقر للنسخ</div>
+      <div id="explorerLink"></div>
+      <div id="infoGrid" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="cardh"><div class="chico">💧</div>إضافة سيولة على Ref Finance</div>
+      <div class="al al-info">ℹ️ أضف سيولة لتمكين تداول توكنك</div>
+      <div class="lqs"><div class="lqn">1</div><div><div class="lqt">افتح Ref Finance</div><div class="lqb">اذهب إلى <a href="https://app.ref.finance" target="_blank">app.ref.finance</a> وربط محفظتك</div></div></div>
+      <div class="lqs"><div class="lqn">2</div><div><div class="lqt">أنشئ Pool جديد</div><div class="lqb">اذهب إلى <strong style="color:#fff">Pools → Create Pool</strong> وأدخل: <code id="liqAddr">-</code></div></div></div>
+      <div class="lqs"><div class="lqn">3</div><div><div class="lqt">اختر الزوج</div><div class="lqb">الموصى به: توكنك مع <strong style="color:#fff">NEAR</strong> أو <strong style="color:#fff">USDC.e</strong></div></div></div>
+      <div class="lqs"><div class="lqn">4</div><div><div class="lqt">أضف السيولة</div><div class="lqb">حدد المبالغ واضغط <strong style="color:#fff">Add Liquidity</strong></div></div></div>
+      <a href="https://app.ref.finance" target="_blank" style="text-decoration:none">
+        <button class="btn btnb" style="margin-top:10px">💧 فتح Ref Finance</button>
+      </a>
+    </div>
+    <div class="al al-ok">🎉 تم حفظ توكنك في لوحة "توكناتي"</div>
+    <button class="btn btnp" onclick="fullReset()">+ إنشاء توكن جديد</button>
+    <button class="btn btns" onclick="goPage('dashboard')" style="margin-top:9px">📋 عرض جميع توكناتي</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: DASHBOARD ══ -->
+<div id="page-dashboard" style="display:none">
+  <div class="wrap">
+    <div class="hero" style="margin-bottom:24px">
+      <h1 style="font-size:1.85rem">📋 <em>توكناتي</em></h1>
+      <p>جميع التوكنات التي أنشأتها</p>
+    </div>
+    <div id="dashContent"></div>
+    <button class="btn btnp" onclick="goPage('create')" style="margin-top:14px">+ إنشاء توكن جديد</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/near-api-js@4.0.3/dist/near-api-js.min.js"></script>
+<script>
+/* ══════════ CONFIG ══════════ */
+const CFG={
+  testnet:{
+    networkId:'testnet',
+    nodeUrl:'https://rpc.testnet.near.org',
+    factory:'token.primitives.testnet',
+    explorer:'https://testnet.nearblocks.io',
+    walletUrl:'https://testnet.mynearwallet.com'
+  },
+  mainnet:{
+    networkId:'mainnet',
+    nodeUrl:'https://rpc.mainnet.near.org',
+    factory:'token.primitives.near',
+    explorer:'https://nearblocks.io',
+    walletUrl:'https://app.mynearwallet.com'
+  }
+};
+
+/* ══════════ STATE ══════════ */
+const S={
+  net: ls('nc_net')||'mainnet',
+  wType: ls('nc_wt')||'mynearwallet',
+  accountId: ls('nc_account')||null,
+  near: null
+};
+
+function ls(k,v){if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k);}
+
+/* ══════════ NEAR INIT ══════════ */
+async function initNear(){
+  const {keyStores,connect}=nearApi;
+  const ks=new keyStores.BrowserLocalStorageKeyStore();
+  S.near=await connect({...CFG[S.net],keyStore:ks});
+}
+
+/* ══════════ NETWORK ══════════ */
+function setNet(n){
+  S.net=n; ls('nc_net',n);
+  $('mnbT').classList.toggle('act',n==='testnet');
+  $('mnbM').classList.toggle('act',n==='mainnet');
+  $('s1Net').textContent=n==='testnet'?'Testnet (تجريبي)':'Mainnet (رئيسي)';
+}
+
+/* ══════════ MODAL ══════════ */
+function openWModal(){
+  $('wModal').classList.add('show');
+  $('mnbT').classList.toggle('act',S.net==='testnet');
+  $('mnbM').classList.toggle('act',S.net==='mainnet');
+}
+function closeWModal(){$('wModal').classList.remove('show');}
+
+/* ══════════ WALLET REDIRECT — Manual (no WalletConnection) ══════════
+   Each wallet uses NEAR's standard login URL format:
+   /login/?title=...&success_url=...&failure_url=...
+══════════════════════════════════════════════════════════════════════ */
+function doConnect(type){
+  closeWModal();
+  S.wType=type; ls('nc_wt',type);
+  ls('nc_net',S.net);
+
+  const base=location.origin+location.pathname;
+  const ok=encodeURIComponent(base+'?nc_ok=1&nc_net='+S.net+'&nc_wt='+type);
+  const fail=encodeURIComponent(base+'?nc_err=1');
+  const title=encodeURIComponent('NEAR Token Creator');
+
+  let walletLoginUrl='';
+
+  if(type==='here'){
+    // HERE Wallet web
+    const hw=S.net==='testnet'?'https://testnet.herewallet.app':'https://web.herewallet.app';
+    walletLoginUrl=`${hw}/login/?title=${title}&success_url=${ok}&failure_url=${fail}`;
+  } else if(type==='near-mobile'){
+    // NEAR Mobile uses MyNearWallet URL (same standard)
+    walletLoginUrl=`${CFG[S.net].walletUrl}/login/?title=${title}&success_url=${ok}&failure_url=${fail}`;
+  } else if(type==='meteor'){
+    // Meteor Wallet
+    const mw=S.net==='testnet'?'https://wallet.meteorwallet.app':'https://wallet.meteorwallet.app';
+    walletLoginUrl=`${mw}/login/?title=${title}&success_url=${ok}&failure_url=${fail}`;
+  } else {
+    // MyNearWallet (default)
+    walletLoginUrl=`${CFG[S.net].walletUrl}/login/?title=${title}&success_url=${ok}&failure_url=${fail}`;
+  }
+
+  window.location.href=walletLoginUrl;
+}
+
+function finishConnect(id){
+  S.accountId=id; ls('nc_account',id);
+  $('wBtn').classList.add('on');
+  $('wTxt').textContent=id;
+  $('discBtn').style.display='block';
+  goStep(2);
+}
+
+function disconnect(){
+  S.accountId=null;
+  ls('nc_account','');
+  // clear near-api-js keys
+  Object.keys(localStorage).filter(k=>k.startsWith('near-api-js')||k.startsWith('_near_')||k.includes(':'+S.net)).forEach(k=>localStorage.removeItem(k));
+  $('wBtn').classList.remove('on');
+  $('wTxt').textContent='ربط المحفظة';
+  $('discBtn').style.display='none';
+  goStep(1);
+}
+
+/* ══════════ PREVIEW ══════════ */
+function updPrev(){
+  const name=v('tName')||'اسم التوكن',sym=v('tSym').toUpperCase()||'SYMBOL',sup=parseInt(v('tSup'))||0;
+  $('pName').textContent=name; $('pSym').textContent='$'+sym;
+  $('pSup').textContent='العرض: '+sup.toLocaleString('ar');
+  $('pIco').textContent=sym.substring(0,2);
+}
+function updIcon(){
+  const url=v('tIcon'),el=$('pIco'),fb=(v('tSym')||'TK').substring(0,2);
+  url?el.innerHTML=`<img src="${url}" onerror="this.parentElement.textContent='${fb}'">`:el.textContent=fb;
+}
+
+/* ══════════ GO DEPLOY ══════════ */
+function goDeploy(){
+  const name=v('tName').trim(),sym=v('tSym').trim(),sup=v('tSup');
+  if(!name)return alert('أدخل اسم التوكن');
+  if(!sym||!/^[A-Za-z0-9]+$/.test(sym))return alert('الرمز: أحرف إنجليزية وأرقام فقط');
+  if(!sup||+sup<1)return alert('أدخل إجمالي عرض صحيح');
+  const con=`${sym.toLowerCase()}.${CFG[S.net].factory}`;
+  $('rNet').textContent=S.net; $('rCon').textContent=con;
+  $('reviewBox').innerHTML=`
+    <div class="cr"><span class="cl">اسم التوكن</span><span class="cv">${name}</span></div>
+    <div class="cr"><span class="cl">الرمز</span><span class="cvg">$${sym.toUpperCase()}</span></div>
+    <div class="cr"><span class="cl">إجمالي العرض</span><span class="cv">${(+sup).toLocaleString('ar')}</span></div>
+    <div class="cr"><span class="cl">الخانات العشرية</span><span class="cv">${v('tDec')}</span></div>
+    <div class="cr"><span class="cl">المالك</span><span class="cv" style="font-size:.69rem;direction:ltr;font-family:monospace">${S.accountId}</span></div>`;
+  goStep(3);
+}
+
+/* ══════════ DEPLOY ══════════ */
+async function deployToken(){
+  const btn=$('depBtn');
+  btn.disabled=true; btn.innerHTML='<div class="sp"></div> جاري الإرسال...';
+  $('dErr')?.remove();
+  try{
+    await initNear();
+    if(!S.accountId)throw new Error('المحفظة غير مرتبطة');
+
+    const name=v('tName').trim(), sym=v('tSym').trim().toLowerCase();
+    const dec=parseInt(v('tDec')), sup=v('tSup'), icon=v('tIcon').trim();
+
+    let ts;
+    try{ts=(BigInt(Math.floor(+sup))*(10n**BigInt(dec))).toString();}
+    catch(e){ts=String(Math.floor(+sup)*Math.pow(10,dec));}
+
+    const factory=CFG[S.net].factory;
+    const account=await S.near.account(S.accountId);
+
+    const result=await account.functionCall({
+      contractId:factory,
+      methodName:'create_token',
+      args:{
+        args:{
+          owner_id:S.accountId,
+          total_supply:ts,
+          metadata:{spec:'ft-1.0.0',name,symbol:sym.toUpperCase(),decimals:dec,...(icon?{icon}:{})}
+        },
+        account_id:sym
+      },
+      gas:'300000000000000',
+      attachedDeposit:'3000000000000000000000000'
+    });
+
+    const addr=`${sym}.${factory}`;
+    const tx=result.transaction?.hash||result.transaction_outcome?.id||'';
+    const td={name,symbol:sym.toUpperCase(),supply:+sup,decimals:dec,icon,contract:addr,owner:S.accountId,net:S.net,tx,date:new Date().toISOString()};
+    saveToken(td);
+    showTokenPage(td,tx);
+
+  }catch(err){
+    btn.disabled=false; btn.innerHTML='🚀 إعادة المحاولة';
+    const d=document.createElement('div');
+    d.id='dErr'; d.className='al al-err'; d.style.marginTop='11px';
+    d.textContent='❌ '+(err.message||'حدث خطأ');
+    btn.after(d);
+  }
+}
+
+/* ══════════ TOKEN PAGE ══════════ */
+function showTokenPage(t,tx){
+  const el=$('thIco');
+  t.icon?el.innerHTML=`<img src="${t.icon}" onerror="this.parentElement.textContent='${t.symbol.substring(0,2)}'">`:el.textContent=t.symbol.substring(0,2);
+  $('thName').textContent=t.name; $('thSym').textContent='$'+t.symbol;
+  $('thSup').textContent=t.supply.toLocaleString('ar');
+  $('thDec').textContent=t.decimals;
+  $('thNet').textContent=t.net==='mainnet'?'🌐 Main':'🧪 Test';
+  $('sucAddr').textContent=t.contract;
+  $('liqAddr').textContent=t.contract;
+  const ex=CFG[t.net].explorer;
+  $('explorerLink').innerHTML=tx?`<a href="${ex}/txns/${tx}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;color:var(--g);font-size:.8rem;text-decoration:none;margin-bottom:12px">🔍 عرض على المستكشف</a>`:'';
+  $('infoGrid').innerHTML=`
+    <div class="irow"><span class="ik">المالك</span><span class="ivg">${t.owner}</span></div>
+    <div class="irow"><span class="ik">تاريخ الإنشاء</span><span class="iv">${new Date(t.date).toLocaleDateString('ar-SA')}</span></div>
+    <div class="irow"><span class="ik">الشبكة</span><span class="iv">${t.net}</span></div>
+    ${tx?`<div class="irow"><span class="ik">TX Hash</span><span class="iv" style="font-size:.65rem">${tx.substring(0,28)}...</span></div>`:''}`;
+  goStep(4);
+}
+
+function copyAddr(){
+  navigator.clipboard.writeText($('sucAddr').textContent).then(()=>{
+    $('copyHint').textContent='✅ تم النسخ!';
+    setTimeout(()=>$('copyHint').textContent='📋 انقر للنسخ',2000);
+  });
+}
+
+/* ══════════ DASHBOARD ══════════ */
+function saveToken(t){const a=loadTokens();a.unshift(t);ls('nc_tokens',JSON.stringify(a.slice(0,50)));}
+function loadTokens(){try{return JSON.parse(localStorage.getItem('nc_tokens'))||[];}catch{return[];}}
+function renderDashboard(){
+  const tokens=loadTokens(),el=$('dashContent');
+  if(!tokens.length){el.innerHTML=`<div class="dempty"><div style="font-size:2.5rem">🪙</div><p>لم تنشئ أي توكن بعد</p></div>`;return;}
+  el.innerHTML=tokens.map((t,i)=>`
+    <div class="tkcard" onclick="showSaved(${i})">
+      <div class="tkcico">${t.icon?`<img src="${t.icon}" onerror="this.parentElement.textContent='${t.symbol.substring(0,2)}'">`:t.symbol.substring(0,2)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="tkcn">${t.name} <span style="color:var(--g);font-size:.8rem">$${t.symbol}</span></div>
+        <div class="tkca">${t.contract}</div>
+      </div>
+      <span class="tknet ${t.net==='mainnet'?'nm':'nt'}">${t.net}</span>
+    </div>`).join('');
+}
+function showSaved(i){
+  const t=loadTokens()[i];if(!t)return;
+  S.net=t.net; goPage('create');
+  setTimeout(()=>showTokenPage(t,t.tx||''),80);
+}
+
+/* ══════════ STEPS / PAGES ══════════ */
+function goStep(n){
+  [1,2,3,4].forEach(i=>{
+    $('s'+i).classList.toggle('show',i===n);
+    const ps=$('ps'+i);
+    ps.className='ps'+(i===n?' act':i<n?' done':'');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goPage(name){
+  $('page-create').style.display=name==='create'?'block':'none';
+  $('page-dashboard').style.display=name==='dashboard'?'block':'none';
+  if(name==='dashboard')renderDashboard();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function fullReset(){
+  ['tName','tSym','tDesc','tIcon'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  $('tSup').value='1000000';
+  goStep(S.accountId?2:1);
+}
+
+/* ══════════ HELPERS ══════════ */
+const $=id=>document.getElementById(id);
+const v=id=>$(id)?.value||'';
+
+/* ══════════ ON LOAD ══════════ */
+window.addEventListener('load',async()=>{
+  const p=new URLSearchParams(location.search);
+
+  // Restore net/wallet from URL params (returned from wallet)
+  const rn=p.get('nc_net'),rw=p.get('nc_wt');
+  if(rn){S.net=rn;ls('nc_net',rn);}
+  if(rw){S.wType=rw;ls('nc_wt',rw);}
+  setNet(S.net);
+
+  // Wallet returned with account_id
+  if(p.get('nc_ok')){
+    const id=p.get('account_id')||p.get('accountId')||ls('nc_account');
+    history.replaceState({},'',location.pathname);
+    if(id){finishConnect(id);return;}
+  }
+
+  // Wallet error
+  if(p.get('nc_err')){
+    history.replaceState({},'',location.pathname);
+    const d=document.createElement('div');
+    d.className='al al-err';d.style.marginBottom='12px';
+    d.textContent='❌ فشل الاتصال بالمحفظة. حاول مرة أخرى.';
+    $('s1msg').appendChild(d);
+  }
+
+  // Already connected from previous session
+  if(S.accountId){
+    $('wBtn').classList.add('on');
+    $('wTxt').textContent=S.accountId;
+    $('discBtn').style.display='block';
+    goStep(2);
+  }
+});
+</script>
+</body>
+</html>
