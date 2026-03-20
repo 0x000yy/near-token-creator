@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منشئ التوكن على NEAR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --g: #00EC97;
+  --dark: #0A1628;
+  --card: #0D1F35;
+  --border: #162F4A;
+  --text: #C8DFF0;
+  --muted: #4A6A85;
+  --red: #FF4D6D;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 15% 60%, rgba(0,236,151,.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(0,120,255,.06) 0%, transparent 50%);
+}
+
+.hdr {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:18px 36px; border-bottom:1px solid var(--border);
+  background:rgba(10,22,40,.92); backdrop-filter:blur(12px);
+  position:sticky; top:0; z-index:200;
+}
+.logo { display:flex; align-items:center; gap:10px; font-size:1.25rem; font-weight:900; color:#fff; }
+.logo-box { width:36px; height:36px; background:var(--g); border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:900; color:#000; font-size:1rem; }
+.logo em { color:var(--g); font-style:normal; }
+
+#wBtn {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 20px; border-radius:10px;
+  font-family:'Cairo',sans-serif; font-size:.9rem; font-weight:700;
+  cursor:pointer; transition:.2s;
+  border:1.5px solid var(--g); background:transparent; color:var(--g);
+}
+#wBtn:hover, #wBtn.on { background:var(--g); color:#000; }
+#wBtn.on { font-size:.78rem; }
+
+.wrap { max-width:660px; margin:0 auto; padding:44px 18px 60px; }
+
+.hero { text-align:center; margin-bottom:44px; }
+.hero h1 { font-size:2.4rem; font-weight:900; color:#fff; line-height:1.3; margin-bottom:12px; }
+.hero h1 em { color:var(--g); font-style:normal; }
+.hero p { color:var(--muted); font-size:1rem; line-height:1.8; }
+
+.prog { display:flex; border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:36px; }
+.ps {
+  flex:1; padding:14px 8px; text-align:center;
+  background:var(--card); border-left:1px solid var(--border);
+  color:var(--muted); font-size:.82rem; transition:.3s; opacity:.5;
+}
+.ps:last-child { border-left:none; }
+.ps.act { opacity:1; color:var(--g); background:rgba(0,236,151,.05); }
+.ps.done { opacity:.85; color:var(--text); }
+.ps b { display:block; width:24px; height:24px; border-radius:50%; margin:0 auto 5px; line-height:24px; font-size:.78rem; background:var(--border); }
+.ps.act b { background:var(--g); color:#000; }
+.ps.done b { background:rgba(0,236,151,.2); color:var(--g); }
+
+.card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:32px; margin-bottom:20px; }
+.card-h { font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:24px; }
+
+.field { margin-bottom:20px; }
+label { display:block; font-size:.88rem; font-weight:600; color:var(--text); margin-bottom:7px; }
+.hint { font-weight:400; color:var(--muted); font-size:.78rem; margin-right:5px; }
+input, select {
+  width:100%; background:rgba(0,0,0,.35); border:1.5px solid var(--border);
+  border-radius:10px; padding:12px 14px; color:#fff;
+  font-family:'Cairo',sans-serif; font-size:.95rem; outline:none; transition:.2s;
+}
+input:focus, select:focus { border-color:var(--g); box-shadow:0 0 0 3px rgba(0,236,151,.07); }
+input::placeholder { color:var(--muted); font-size:.88rem; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.fn { font-size:.75rem; color:var(--muted); margin-top:5px; }
+
+.net-tog { display:flex; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:20px; }
+.net-tog button {
+  flex:1; padding:10px; background:transparent; border:none; border-left:1px solid var(--border);
+  color:var(--muted); font-family:'Cairo',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; transition:.2s;
+}
+.net-tog button:last-child { border-left:none; }
+.net-tog button.act { background:var(--g); color:#000; }
+
+.al { border-radius:10px; padding:13px 15px; font-size:.85rem; margin-bottom:18px; display:flex; align-items:flex-start; gap:9px; line-height:1.65; }
+.al-info { background:rgba(0,100,255,.08); border:1px solid rgba(0,100,255,.2); color:#7AB8FF; }
+.al-warn { background:rgba(255,160,0,.08); border:1px solid rgba(255,160,0,.2); color:#FFB84D; }
+.al-ok   { background:rgba(0,236,151,.08); border:1px solid rgba(0,236,151,.2); color:var(--g); }
+.al-err  { background:rgba(255,77,109,.08); border:1px solid rgba(255,77,109,.2); color:var(--red); }
+
+.prev {
+  background:rgba(0,236,151,.04); border:1px dashed rgba(0,236,151,.3);
+  border-radius:14px; padding:18px; margin-top:24px;
+  display:flex; align-items:center; gap:16px;
+}
+.prev-ico {
+  width:54px; height:54px; border-radius:50%; flex-shrink:0; overflow:hidden;
+  background:linear-gradient(135deg,var(--g),#00BFFF);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; font-weight:900; color:#000;
+}
+.prev-ico img { width:100%; height:100%; object-fit:cover; }
+
+.cost-r { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:.85rem; }
+.cost-r:last-child { border-bottom:none; }
+.cl { color:var(--muted); }
+.cv { color:#fff; font-weight:600; }
+.cv.g { color:var(--g); }
+
+.btn {
+  width:100%; padding:15px; border-radius:12px;
+  font-family:'Cairo',sans-serif; font-size:1rem; font-weight:700;
+  cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.btn-p { background:var(--g); color:#000; border:none; margin-top:20px; }
+.btn-p:hover:not(:disabled) { background:#00d48a; transform:translateY(-1px); }
+.btn-p:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+.btn-s { background:transparent; color:var(--text); border:1.5px solid var(--border); margin-top:10px; }
+.btn-s:hover { border-color:var(--text); }
+
+.sp { width:18px; height:18px; border:2px solid rgba(0,0,0,.25); border-top-color:#000; border-radius:50%; animation:spin .75s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.suc { text-align:center; padding:10px 0; }
+.suc-ring {
+  width:76px; height:76px; border-radius:50%;
+  background:rgba(0,236,151,.1); border:2px solid var(--g);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem; color:var(--g); margin:0 auto 22px;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,236,151,.3)} 50%{box-shadow:0 0 0 14px rgba(0,236,151,0)} }
+.suc h2 { font-size:1.5rem; color:#fff; margin-bottom:8px; }
+.suc p  { color:var(--muted); margin-bottom:22px; font-size:.9rem; }
+.cbox {
+  background:rgba(0,0,0,.35); border:1px solid var(--border); border-radius:10px;
+  padding:13px 15px; font-family:monospace; font-size:.82rem; color:var(--g);
+  word-break:break-all; direction:ltr; text-align:left; cursor:pointer; transition:.2s; margin-bottom:6px;
+}
+.cbox:hover { background:rgba(0,236,151,.05); }
+.chint { font-size:.75rem; color:var(--muted); margin-bottom:18px; }
+
+.scr { display:none; }
+.scr.show { display:block; }
+
+@media(max-width:580px){
+  .hdr { padding:14px 16px; }
+  .wrap { padding:28px 14px 50px; }
+  .hero h1 { font-size:1.75rem; }
+  .card { padding:22px 18px; }
+  .row2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-box">N</div>
+    NEAR <em>Token</em>
+  </div>
+  <button id="wBtn" onclick="connectWallet()">
+    💳 <span id="wTxt">ربط المحفظة</span>
+  </button>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <h1>أنشئ <em>توكنك</em> على<br>شبكة NEAR</h1>
+    <p>إنشاء توكن NEP-141 حقيقي عبر <code style="color:var(--g)">token.primitives.near</code><br>بدون أي خبرة برمجية — متصل فعلياً بالبلوكشين</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="prog">
+    <div class="ps act" id="ps1"><b>1</b>المحفظة</div>
+    <div class="ps"     id="ps2"><b>2</b>التفاصيل</div>
+    <div class="ps"     id="ps3"><b>3</b>المراجعة</div>
+    <div class="ps"     id="ps4"><b>4</b>✓ تم</div>
+  </div>
+
+  <!-- ═══ SCREEN 1: CONNECT ═══ -->
+  <div class="scr show" id="s1">
+    <div class="card">
+      <div class="card-h">🔌 الخطوة الأولى: ربط المحفظة</div>
+
+      <label>اختر الشبكة</label>
+      <div class="net-tog" style="margin-top:8px">
+        <button id="nbT" onclick="setNet('testnet')">🧪 Testnet (تجريبي مجاني)</button>
+        <button id="nbM" onclick="setNet('mainnet')" class="act">🌐 Mainnet (رئيسي)</button>
+      </div>
+
+      <div class="al al-warn" id="netNote">
+        ⚠️ الشبكة الرئيسية تستخدم NEAR حقيقي. جرّب Testnet أولاً للتأكد
+      </div>
+
+      <div class="al al-info">
+        ℹ️ تحتاج محفظة NEAR. أنشئها مجاناً على
+        <a href="https://mynearwallet.com" target="_blank" style="color:var(--g);margin-right:4px">mynearwallet.com</a>
+      </div>
+
+      <button class="btn btn-p" onclick="connectWallet()">
+        💳 ربط عبر MyNearWallet
+      </button>
+      <p style="text-align:center;margin-top:14px;font-size:.78rem;color:var(--muted)">
+        🔒 مفاتيحك الخاصة لا تُشارك أبداً — التوقيع يتم عبر محفظتك مباشرة
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 2: TOKEN DETAILS ═══ -->
+  <div class="scr" id="s2">
+    <div class="card">
+      <div class="card-h">🪙 تفاصيل التوكن</div>
+
+      <div class="row2">
+        <div class="field">
+          <label>اسم التوكن <span class="hint">مثال: My Token</span></label>
+          <input id="tName" placeholder="My Token" oninput="updPrev()">
+        </div>
+        <div class="field">
+          <label>الرمز <span class="hint">مثال: MTK</span></label>
+          <input id="tSym" placeholder="MTK" maxlength="10" oninput="this.value=this.value.toUpperCase();updPrev()">
+          <div class="fn">أحرف إنجليزية وأرقام فقط</div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>إجمالي العرض</label>
+          <input id="tSup" type="number" value="1000000" min="1" oninput="updPrev()">
+        </div>
+        <div class="field">
+          <label>الخانات العشرية</label>
+          <select id="tDec" onchange="updPrev()">
+            <option value="0">0</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="18">18</option>
+            <option value="24" selected>24 (NEAR افتراضي)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>وصف <span class="hint">اختياري</span></label>
+        <input id="tDesc" placeholder="وصف مختصر لتوكنك">
+      </div>
+
+      <div class="field">
+        <label>رابط الشعار (PNG/SVG) <span class="hint">اختياري</span></label>
+        <input id="tIcon" type="url" placeholder="https://example.com/logo.png" oninput="updIcon()">
+        <div class="fn">صورة مربعة 128×128 على الأقل</div>
+      </div>
+
+      <!-- Preview -->
+      <div class="prev">
+        <div class="prev-ico" id="pIco">TK</div>
+        <div>
+          <div style="font-size:1rem;font-weight:700;color:#fff" id="pName">اسم التوكن</div>
+          <div style="font-size:.82rem;color:var(--g);margin-top:2px" id="pSym">$SYMBOL</div>
+          <div style="font-size:.77rem;color:var(--muted);margin-top:3px" id="pSup">العرض: 1,000,000</div>
+        </div>
+      </div>
+
+      <button class="btn btn-p" onclick="goDeploy()">المتابعة للمراجعة ←</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 3: REVIEW ═══ -->
+  <div class="scr" id="s3">
+    <div class="card">
+      <div class="card-h">🚀 مراجعة ونشر التوكن</div>
+
+      <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:16px;margin-bottom:16px" id="reviewBox"></div>
+
+      <div class="cost-r"><span class="cl">رسوم النشر</span><span class="cv">~3 NEAR</span></div>
+      <div class="cost-r"><span class="cl">رسوم الغاز</span><span class="cv">300 TGas</span></div>
+      <div class="cost-r"><span class="cl">الشبكة</span><span class="cv g" id="rNet">-</span></div>
+      <div class="cost-r"><span class="cl">عنوان العقد (بعد النشر)</span><span class="cv g" id="rContract" style="font-size:.75rem;direction:ltr">-</span></div>
+
+      <div class="al al-warn" style="margin-top:16px">
+        ⚠️ لا يمكن تعديل اسم التوكن أو رمزه بعد النشر — تأكد جيداً
+      </div>
+
+      <button class="btn btn-p" id="depBtn" onclick="deployToken()">🚀 نشر التوكن الآن</button>
+      <button class="btn btn-s" onclick="goStep(2)">← العودة للتعديل</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 4: SUCCESS ═══ -->
+  <div class="scr" id="s4">
+    <div class="card">
+      <div class="suc">
+        <div class="suc-ring">✓</div>
+        <h2>تم نشر توكنك بنجاح! 🎉</h2>
+        <p>توكنك الآن حي على شبكة NEAR وجاهز للتداول</p>
+
+        <div style="text-align:right;font-size:.82rem;color:var(--muted);margin-bottom:6px">عنوان العقد (انقر للنسخ):</div>
+        <div class="cbox" id="sucAddr" onclick="copyAddr()">-</div>
+        <div class="chint" id="copyHint">📋 انقر للنسخ</div>
+
+        <div id="explorerLink" style="margin-bottom:18px"></div>
+
+        <div class="al al-ok" style="text-align:right">
+          💡 أضف توكنك الآن إلى
+          <a href="https://app.ref.finance" target="_blank" style="color:#fff;font-weight:700;margin-right:4px">Ref Finance</a>
+          لإضافة سيولة وتداوله
+        </div>
+
+        <button class="btn btn-p" onclick="reset()" style="margin-top:4px">+ إنشاء توكن جديد</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- near-api-js v4 via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/near-api-js@4.0.3/dist/near-api-js.min.js"></script>
+
+<script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+const S = { net:'mainnet', accountId:null, near:null, wallet:null };
+
+/* ══════════════════════════════════════
+   NEAR CONFIG PER NETWORK
+══════════════════════════════════════ */
+const CFG = {
+  testnet:{
+    networkId:'testnet',
+    nodeUrl:'https://rpc.testnet.near.org',
+    walletUrl:'https://testnet.mynearwallet.com',
+    helperUrl:'https://helper.testnet.near.org',
+    factory:'token.primitives.testnet',
+    explorer:'https://testnet.nearblocks.io',
+  },
+  mainnet:{
+    networkId:'mainnet',
+    nodeUrl:'https://rpc.mainnet.near.org',
+    walletUrl:'https://app.mynearwallet.com',
+    helperUrl:'https://helper.mainnet.near.org',
+    factory:'token.primitives.near',
+    explorer:'https://nearblocks.io',
+  },
+};
+
+/* ══════════════════════════════════════
+   INIT near-api-js
+══════════════════════════════════════ */
+async function initNear() {
+  const c = CFG[S.net];
+  const { keyStores, connect, WalletConnection } = nearApi;
+  const keyStore = new keyStores.BrowserLocalStorageKeyStore();
+  S.near   = await connect({ ...c, keyStore });
+  S.wallet = new WalletConnection(S.near, 'near-token-creator-' + S.net);
+}
+
+/* ══════════════════════════════════════
+   NETWORK TOGGLE
+══════════════════════════════════════ */
+function setNet(n) {
+  S.net = n;
+  localStorage.setItem('nc_net', n);
+  document.getElementById('nbT').classList.toggle('act', n === 'testnet');
+  document.getElementById('nbM').classList.toggle('act', n === 'mainnet');
+  const note = document.getElementById('netNote');
+  if (n === 'testnet') {
+    note.className = 'al al-info';
+    note.innerHTML = 'ℹ️ Testnet مجاني تماماً. احصل على NEAR تجريبي من <a href="https://near-faucet.io" target="_blank" style="color:var(--g);margin-right:4px">near-faucet.io</a>';
+  } else {
+    note.className = 'al al-warn';
+    note.innerHTML = '⚠️ الشبكة الرئيسية تستخدم NEAR حقيقي. جرّب Testnet أولاً للتأكد';
+  }
+}
+
+/* ══════════════════════════════════════
+   WALLET CONNECT
+══════════════════════════════════════ */
+async function connectWallet() {
+  await initNear();
+  if (S.wallet.isSignedIn()) {
+    finishConnect(S.wallet.getAccountId());
+    return;
+  }
+  // Redirect user to MyNearWallet for login
+  await S.wallet.requestSignIn({
+    successUrl: window.location.origin + window.location.pathname,
+    failureUrl:  window.location.origin + window.location.pathname + '?err=1',
+  });
+}
+
+function finishConnect(id) {
+  S.accountId = id;
+  const btn = document.getElementById('wBtn');
+  btn.classList.add('on');
+  document.getElementById('wTxt').textContent = id;
+  goStep(2);
+}
+
+/* ══════════════════════════════════════
+   PREVIEW
+══════════════════════════════════════ */
+function updPrev() {
+  const name = v('tName') || 'اسم التوكن';
+  const sym  = v('tSym').toUpperCase() || 'SYMBOL';
+  const sup  = parseInt(v('tSup')) || 0;
+  byId('pName').textContent = name;
+  byId('pSym').textContent  = '$' + sym;
+  byId('pSup').textContent  = 'العرض: ' + sup.toLocaleString('ar');
+  byId('pIco').textContent  = sym.substring(0,2);
+}
+
+function updIcon() {
+  const url = v('tIcon');
+  const el  = byId('pIco');
+  if (url) {
+    el.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='${v('tSym').substring(0,2)||'TK'}'">`;
+  } else {
+    el.textContent = v('tSym').substring(0,2) || 'TK';
+  }
+}
+
+/* ══════════════════════════════════════
+   GO TO DEPLOY SCREEN
+══════════════════════════════════════ */
+function goDeploy() {
+  const name = v('tName').trim();
+  const sym  = v('tSym').trim();
+  const sup  = v('tSup');
+  if (!name) return alert('أدخل اسم التوكن');
+  if (!sym || !/^[A-Za-z0-9]+$/.test(sym)) return alert('الرمز: أحرف إنجليزية وأرقام فقط');
+  if (!sup || +sup < 1) return alert('أدخل إجمالي عرض صحيح');
+
+  const factory  = CFG[S.net].factory;
+  const contract = `${sym.toLowerCase()}.${factory}`;
+  byId('rNet').textContent      = S.net;
+  byId('rContract').textContent = contract;
+
+  byId('reviewBox').innerHTML = `
+    <div class="cost-r"><span class="cl">اسم التوكن</span><span class="cv">${name}</span></div>
+    <div class="cost-r"><span class="cl">الرمز</span><span class="cv g">$${sym.toUpperCase()}</span></div>
+    <div class="cost-r"><span class="cl">إجمالي العرض</span><span class="cv">${(+sup).toLocaleString('ar')}</span></div>
+    <div class="cost-r"><span class="cl">الخانات العشرية</span><span class="cv">${v('tDec')}</span></div>
+    <div class="cost-r"><span class="cl">المالك</span><span class="cv" style="font-size:.75rem;direction:ltr">${S.accountId}</span></div>
+  `;
+  goStep(3);
+}
+
+/* ══════════════════════════════════════
+   REAL DEPLOY — calls token.primitives.near
+══════════════════════════════════════ */
+async function deployToken() {
+  const btn = byId('depBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="sp"></div> جاري إرسال المعاملة...';
+  byId('dErr')?.remove();
+
+  try {
+    await initNear();
+
+    if (!S.wallet.isSignedIn()) throw new Error('المحفظة غير مرتبطة');
+
+    const name = v('tName').trim();
+    const sym  = v('tSym').trim().toLowerCase();
+    const dec  = parseInt(v('tDec'));
+    const sup  = v('tSup');
+    const desc = v('tDesc').trim();
+    const icon = v('tIcon').trim();
+
+    // Compute total_supply accounting for decimals
+    // Use string arithmetic to avoid JS float precision issues
+    let totalSupply;
+    try {
+      totalSupply = (BigInt(Math.floor(+sup)) * (10n ** BigInt(dec))).toString();
+    } catch(e) {
+      totalSupply = String(Math.floor(+sup) * Math.pow(10, dec));
+    }
+
+    const factory = CFG[S.net].factory;
+    const account = await S.near.account(S.wallet.getAccountId());
+
+    // Args structure required by token.primitives.near/testnet
+    const args = {
+      args: {
+        owner_id: S.wallet.getAccountId(),
+        total_supply: totalSupply,
+        metadata: {
+          spec: 'ft-1.0.0',
+          name: name,
+          symbol: sym.toUpperCase(),
+          decimals: dec,
+          ...(icon ? { icon } : {}),
+          ...(desc ? { reference: null, reference_hash: null } : {}),
+        },
+      },
+      account_id: sym,
+    };
+
+    // 3 NEAR deposit in yoctoNEAR
+    const DEPOSIT = '3000000000000000000000000';
+
+    const result = await account.functionCall({
+      contractId: factory,
+      methodName: 'create_token',
+      args,
+      gas: '300000000000000',
+      attachedDeposit: DEPOSIT,
+    });
+
+    const contractAddr = `${sym}.${factory}`;
+    const txHash = result.transaction?.hash
+      || result.transaction_outcome?.id
+      || '';
+
+    showSuccess(contractAddr, txHash);
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 إعادة المحاولة';
+    const div = document.createElement('div');
+    div.id = 'dErr';
+    div.className = 'al al-err';
+    div.style.marginTop = '14px';
+    div.textContent = '❌ ' + (err.message || 'حدث خطأ أثناء النشر');
+    btn.after(div);
+  }
+}
+
+/* ══════════════════════════════════════
+   SUCCESS SCREEN
+══════════════════════════════════════ */
+function showSuccess(addr, txHash) {
+  byId('sucAddr').textContent = addr;
+  const ex = CFG[S.net].explorer;
+  byId('explorerLink').innerHTML = txHash
+    ? `<a href="${ex}/txns/${txHash}" target="_blank"
+         style="display:inline-flex;align-items:center;gap:7px;color:var(--g);font-size:.85rem;text-decoration:none">
+         🔍 عرض المعاملة على المستكشف</a>`
+    : '';
+  goStep(4);
+}
+
+function copyAddr() {
+  const t = byId('sucAddr').textContent;
+  navigator.clipboard.writeText(t).then(() => {
+    byId('copyHint').textContent = '✅ تم النسخ!';
+    setTimeout(() => byId('copyHint').textContent = '📋 انقر للنسخ', 2000);
+  });
+}
+
+/* ══════════════════════════════════════
+   STEP / SCREEN
+══════════════════════════════════════ */
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    byId('s'+i).classList.toggle('show', i===n);
+    const ps = byId('ps'+i);
+    ps.className = 'ps' + (i===n?' act': i<n?' done':'');
+  });
+  window.scrollTo(0,0);
+}
+
+function reset() {
+  if (S.wallet?.isSignedIn()) S.wallet.signOut();
+  S.accountId = null;
+  byId('wBtn').classList.remove('on');
+  byId('wTxt').textContent = 'ربط المحفظة';
+  ['tName','tSym','tDesc','tIcon'].forEach(id => { const el=byId(id); if(el) el.value=''; });
+  byId('tSup').value = '1000000';
+  goStep(1);
+}
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+const byId = id => document.getElementById(id);
+const v    = id => byId(id)?.value || '';
+
+/* ══════════════════════════════════════
+   ON PAGE LOAD — check if returning from wallet
+══════════════════════════════════════ */
+window.addEventListener('load', async () => {
+  const saved = localStorage.getItem('nc_net') || 'mainnet';
+  S.net = saved;
+  document.getElementById(saved === 'testnet' ? 'nbT' : 'nbM').classList.add('act');
+  document.getElementById(saved === 'testnet' ? 'nbM' : 'nbT').classList.remove('act');
+  if (saved === 'testnet') setNet('testnet');
+
+  await initNear();
+
+  // If wallet just redirected back
+  if (S.wallet && S.wallet.isSignedIn()) {
+    finishConnect(S.wallet.getAccountId());
+  }
+
+  // Error from wallet redirect
+  if (new URLSearchParams(location.search).get('err')) {
+    const div = document.createElement('div');
+    div.className = 'al al-err';
+    div.style.margin = '0 0 16px';
+    div.textContent = '❌ فشل الاتصال بالمحفظة. حاول مرة أخرى.';
+    byId('s1').querySelector('.card').prepend(div);
+  }
+});
+</script>
+</body>
+</html>
